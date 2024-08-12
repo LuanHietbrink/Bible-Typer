@@ -27,13 +27,13 @@ function Form({ route, method }) {
                 navigate("/login")
             }
         } catch (error) {
-            alert(error)
+            alert("Incorrect username or password")
         } finally {
             setLoading(false)
         }
     };
 
-    return (
+    return ( 
         <form onSubmit={handleSubmit} className="form-container">
             <h1>{name}</h1>
             <input
@@ -53,7 +53,7 @@ function Form({ route, method }) {
             <button className="form-button" type="submit">
                 {name}
             </button>
-        </form>
+        </form>        
     );
 }
 

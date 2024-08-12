@@ -6,6 +6,8 @@ import Home from "./pages/Home"
 import NotFound from "./pages/NotFound"
 import ProtectedRoute from "./components/ProtectedRoute"
 import TypeTest from "./pages/TypeTest"
+import Navbar from "./components/nav";
+import UserStats from "./pages/Stats"
 
 
 //returns a user to the login page when they sign out of the application
@@ -23,11 +25,13 @@ function RegisterAndLogout() {
 function App() {
   return (
     <BrowserRouter>
+    
       <Routes>
         <Route
           path="/"
           element={
             <ProtectedRoute>
+              <Navbar/>
               <Home />
             </ProtectedRoute>
           }
@@ -36,7 +40,17 @@ function App() {
           path="/test"
           element={
             <ProtectedRoute>
+              <Navbar/>
               <TypeTest />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/stats"
+          element={
+            <ProtectedRoute>
+              <Navbar/>
+              <UserStats />
             </ProtectedRoute>
           }
         />
