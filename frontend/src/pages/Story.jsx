@@ -1,130 +1,133 @@
-import React, { useState, useEffect } from 'react';
-import Result from '../components/Result';
+import React, { useState, useEffect, useMemo } from "react";
+import Result from "../components/Result";
 
 // Sample texts for the typing test
 const sampleTexts = [
-  "The quick brown fox jumps over the lazy dog",
-  "A journey of a thousand miles begins with a single step",
-  "To be or not to be, that is the question",
-  "All that glitters is not gold",
-  "Fortune favors the bold"
+  "For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.",
+  "I can do all things through Christ which strengtheneth me.",
+  "The Lord is my shepherd; I shall not want.",
+  "And we know that all things work together for good to them that love God, to them who are the called according to his purpose.",
+  "Trust in the Lord with all thine heart; and lean not unto thine own understanding. In all thy ways acknowledge him, and he shall direct thy paths.",
+  "Fear thou not; for I am with thee: be not dismayed; for I am thy God: I will strengthen thee; yea, I will help thee; yea, I will uphold thee with the right hand of my righteousness.",
+  "For I know the thoughts that I think toward you, saith the Lord, thoughts of peace, and not of evil, to give you an expected end.",
+  "But seek ye first the kingdom of God, and his righteousness; and all these things shall be added unto you.",
+  "Charity suffereth long, and is kind; charity envieth not; charity vaunteth not itself, is not puffed up, doth not behave itself unseemly, seeketh not her own, is not easily provoked, thinketh no evil;",
+  "For by grace are ye saved through faith; and that not of yourselves: it is the gift of God: Not of works, lest any man should boast.",
 ];
 
-const testIndex = Math.floor(Math.random()*5)
+// Function to select a random sample text from the list
+const getRandomSampleText = () =>
+  sampleTexts[Math.floor(Math.random() * sampleTexts.length)];
 
 const StoryTypingTest = () => {
-   // State variables
-  const [sampleText, setSampleText] = useState(sampleTexts[testIndex]); // Stores the current sample text
-  const [userInput, setUserInput] = useState(""); // Stores the user's input
-  const [startTime, setStartTime] = useState(null); // Stores the start time of the test
-  const [endTime, setEndTime] = useState(null); // Stores the end time of the test
-  const [isTestStarted, setIsTestStarted] = useState(false); // Tracks if the test has started
-  const [correctChars, setCorrectChars] = useState(0); // Counts the number of correct characters typed
+  // State to hold the selected sample text
+  const [sampleText] = useState(getRandomSampleText());
 
-  // Effect hook to handle the start and end of the test
+  // State to track user's input
+  const [userInput, setUserInput] = useState("");
+
+  // State to track the start and end time of the test
+  const [startTime, setStartTime] = useState(null);
+  const [endTime, setEndTime] = useState(null);
+
+  // State to count the number of correctly typed characters
+  const [correctChars, setCorrectChars] = useState(0);
+
+  // Effect hook to handle the start and end of the typing test
   useEffect(() => {
-    if (userInput.length === 1 && !isTestStarted) {
+    // If user starts typing, record the start time
+    if (userInput.length === 1 && !startTime) {
       setStartTime(new Date());
-      setIsTestStarted(true);
     }
 
+    // If user finishes typing the sample text, record the end time
     if (userInput.length === sampleText.length) {
       setEndTime(new Date());
     }
-  }, [userInput, isTestStarted, sampleText]);
+  }, [userInput, sampleText, startTime]);
 
-  // Handle input changes
+  // Handle changes in the input field
   const handleInputChange = (e) => {
     const value = e.target.value;
-    let correctCount = 0;
 
-    // Count the number of correct characters typed
-    for (let i = 0; i < value.length; i++) {
-      if (value[i] === sampleText[i]) {
-        correctCount++;
-      }
-     
-    }
-    setCorrectChars(correctCount);
+    // Calculate the number of correct characters typed so far
+    setCorrectChars(
+      value.split("").reduce((acc, char, i) => {
+        return char === sampleText[i] ? acc + 1 : acc;
+      }, 0)
+    );
 
-    // Only update the input if it's within the sample text length
+    // Update user input state only if it's within the sample text length
     if (value.length <= sampleText.length) {
       setUserInput(value);
     }
   };
 
-  // Calculate Words Per Minute (WPM)
-  const calculateWPM = () => {
+  // Calculate Words Per Minute (WPM) using memoization
+  const calculateWPM = useMemo(() => {
     if (startTime && endTime) {
       const timeDiff = (endTime - startTime) / 1000 / 60; // Convert time difference to minutes
       const wordCount = sampleText.split(" ").length; // Count the number of words in the sample text
       return Math.round(wordCount / timeDiff); // Calculate WPM
     }
     return 0;
-  };
+  }, [startTime, endTime, sampleText]);
 
-  // Calculate accuracy as a percentage
-  const calculateAccuracy = () => {
-    if (userInput.length === 0) return 0;
-    return Math.round((correctChars / userInput.length) * 100);
-  };
+  // Calculate typing accuracy as a percentage using memoization
+  const calculateAccuracy = useMemo(() => {
+    return userInput.length
+      ? Math.round((correctChars / userInput.length) * 100)
+      : 0;
+  }, [correctChars, userInput.length]);
 
-
-  // Render the sample text with colors based on user input
-  const renderText = () => {
+  // Render the sample text with color coding based on user input
+  const renderText = useMemo(() => {
     return sampleText.split("").map((char, index) => {
-      let color = 'black';
-      let backgroundColor = 'transparent';
-      
-      // Determine the color for the character based on the user's input
-      if (index < userInput.length) {
-        if (userInput[index] === char) {
-          color = 'green';
-        } else {
-          color = 'red';
-        }
-      }
-      
-      // Highlight the current position
-      if (index === userInput.length) {
-        backgroundColor = 'lightblue';
-      }
-      
+      const isCorrect = index < userInput.length && userInput[index] === char; // Check if character is typed correctly
+      const isCurrent = index === userInput.length; // Highlight the current character being typed
+
       return (
         <span
           key={index}
-          style={{ color, backgroundColor, padding: '0 2px', borderRadius: '3px' }}
+          style={{
+            color: isCorrect
+              ? "green"
+              : index < userInput.length
+              ? "red"
+              : "black",
+            backgroundColor: isCurrent ? "lightblue" : "transparent",
+            // borderRight: isCurrent ? '1px solid grey' : '',
+            padding: "0 2px",
+            borderRadius: "3px",
+          }}
         >
           {char}
         </span>
       );
     });
-  };
+  }, [sampleText, userInput]);
 
-  // Determine if input field should be disabled
-  const isInputDisabled = endTime !== null;
+  // Determine if the input field should be disabled (i.e., if the test has ended)
+  const isInputDisabled = Boolean(endTime);
 
   return (
     <div>
       <h2>Typing Test</h2>
       {/* Display the sample text with color coding */}
-      <p style={{ fontSize: '24px', fontFamily: 'monospace' }}>
-        {renderText()}
+      <p style={{ fontSize: "20px", fontFamily: "times-new-roman" }}>
+        {renderText}
       </p>
       {/* Hidden input field to capture user input */}
       <input
         type="text"
         value={userInput}
         onChange={handleInputChange}
-        style={{ opacity: 0, position: 'absolute', left: '-9999px' }}
+        style={{ opacity: 0, position: "absolute", left: "-9999px" }}
         autoFocus
-        disabled={isInputDisabled} // Disable input if test has ended
+        disabled={isInputDisabled} // Disable input if the test has ended
       />
-      {/* Show results if the test has ended */}
-      {endTime && (
-        <Result wpm={calculateWPM()} accuracy={calculateAccuracy()} />
-      )}
-      
+      {/* Display results if the test has ended */}
+      {endTime && <Result wpm={calculateWPM} accuracy={calculateAccuracy} />}
     </div>
   );
 };
