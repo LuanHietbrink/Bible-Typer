@@ -7,8 +7,12 @@ import { BrowserRouter as Router, Route, Routes, useNavigate, Navigate } from 'r
 function Home() {
     const navigate = useNavigate();
 
-    const handleStartTyping = () => {
-      navigate('/test');
+    const handleStoryTyping = () => {
+      navigate('/story');
+    };
+
+    const handleCustomTyping = () => {
+      navigate('/custom');
     };
 
     const handleStats = () => {
@@ -29,12 +33,12 @@ function Home() {
               <div className="feature">
                 <h2>Story Mode</h2>
                 <p>From Genesis 1 to Revelation 22. Type the entire Bible verse for verse at your own pace. Choose your time interval and start typing!</p>
-                <button className="cta-button" onClick={handleStartTyping}>Start Typing Now</button>
+                <button className="cta-button" onClick={handleStoryTyping}>Start Typing Now</button>
               </div>
               <div className="feature">
                 <h2>Custom Mode</h2>
                 <p>Choose any chapter from any Book to type.</p>
-                <button className="cta-button" onClick={handleStartTyping}>Start Typing Now</button>
+                <button className="cta-button" onClick={handleCustomTyping}>Start Typing Now</button>
               </div>
               <div className="feature">
                 <h2>Stats tracking</h2>
