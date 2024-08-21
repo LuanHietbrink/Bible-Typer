@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Note
+from models import TypingTest, Testament, Chapter, Book, Verse
+
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -14,9 +15,13 @@ class UserSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(**validated_data)
         return user
 
-
-class NoteSerializer(serializers.ModelSerializer):
+class TypingTestSerializer(serializers.ModelSerializer):
+    
     class Meta:
-        model = Note
-        fields = ["id", "title", "content", "created_at", "author"]
-        extra_kwargs = {"author": {"read_only": True}}
+        model = TypingTest
+        fields = ["user","start_verse","end_verse","wpm","accuracy","duration","attempt_date"]
+    
+    def create(self, validated_data):
+        print(validated_data)
+        test = TypingTest.objects.create(**validated_data)
+        return test
