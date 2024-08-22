@@ -1,27 +1,23 @@
-from django.contrib.auth.models import User
 from rest_framework import serializers
-from models import TypingTest, Testament, Chapter, Book, Verse
-
-
+from .models import User, TypingTest
 
 class UserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
     class Meta:
         model = User
-        fields = ["id", "username", "email","password",]
-        extra_kwargs = {"password": {"write_only": True}}
+        fields = ('id', 'username', 'email', 'password')
 
     def create(self, validated_data):
-        print(validated_data)
-        user = User.objects.create_user(**validated_data)
+        user = User.objects.create(
+            username=validated_data['username'],
+            email=validated_data['email']
+        )
+        user.set_password(validated_data['password'])
+        user.save()
         return user
 
 class TypingTestSerializer(serializers.ModelSerializer):
-    
     class Meta:
         model = TypingTest
-        fields = ["user","start_verse","end_verse","wpm","accuracy","duration","attempt_date"]
-    
-    def create(self, validated_data):
-        print(validated_data)
-        test = TypingTest.objects.create(**validated_data)
-        return test
+        fields = '__all__'
