@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User,TypingTest
 from .serializers import UserSerializer, TypingTestSerializer
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -21,5 +21,6 @@ class RegisterView(generics.CreateAPIView):
         }, status=status.HTTP_201_CREATED)
 
 class TypingTestView(generics.CreateAPIView):
+    permission_classes = (IsAuthenticated)
     queryset = TypingTest.objects.all()
     serializer_class = TypingTestSerializer
