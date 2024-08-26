@@ -3,11 +3,11 @@ from psycopg2 import sql
 import re
 # Database connection parameters
 db_params = {
-    'dbname': 'bible_typer_test_db',
-    'user': 'postgres',
-    'password': 'Butterfly63ffect42',
-    'host': 'localhost',
-    'port': '5432'
+    # 'dbname': '',
+    # 'user': 'postgres',
+    # 'password': '',
+    # 'host': 'localhost',
+    # 'port': '5432'
 }
 file_path = "bible.txt"
 # Path to your Bible verses file
